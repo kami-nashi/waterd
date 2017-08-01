@@ -13,38 +13,45 @@ duration = args.time * int('60')
 
 pin_list = [38,40]
 
-grass = [40]
-plants = [38]
+#grass = [40]
+#plants = [38]
 
 GPIO.setmode(GPIO.BOARD)
 
 for pin in pin_list:
     GPIO.setup(pin, GPIO.OUT)
 
-def release_grass(mode=GPIO.LOW, delay=0):
-    GPIO.output(38, mode)
-
-def release_plants(mode=GPIO.LOW, delay=0):
-    GPIO.output(40, mode)
-
-def trigger(mode=GPIO.LOW, delay=0):
+def trigger_grass(mode=GPIO.LOW, delay=0):
     start = time.time()
-    if args.zone == 'grass':
-            print 'Watering that grass for you....'
-            GPIO.output(38, mode)
-	    release_grass()
-    elif args.zone == 'plants':
-            print 'Watering those plants for you....'
-	    GPIO.output(40, mode)
-	    release_plants()
-    else:
-	    print 'Not something I can understand'
+    print 'Watering that grass for you....'
+    GPIO.output(38, mode)
     time.sleep(delay)
     end = time.time()
-    print 'Hopefully something has been waterd....'
+    print 'Hopefully that grass has been waterd....'
     duration = (end - start)
     print duration, " seconds of watering"
+    GPIO.output(38, GPIO.LOW)
     GPIO.cleanup()
 
+def trigger_plants(mode=GPIO.LOW, delay=0):
+    start = time.time()
+    print 'Watering those plants for you....'
+    GPIO.output(40, mode)
+    time.sleep(delay)
+    end = time.time()
+    print 'Hopefully those plants have been waterd....'
+    duration = (end - start)
+    print duration, " seconds of watering"
+    GPIO.output(40, GPIO.LOW)
+    GPIO.cleanup()
+
+def trigger():
+    if args.zone == 'grass':
+	    trigger_grass(mode=GPIO.HIGH, delay=duration)
+    elif args.zone == 'plants':
+	    trigger_plants(mode=GPIO.HIGH, delay=duration)
+    else:
+	    print 'Not something I understand'
+
 time.sleep(1)
-trigger(mode=GPIO.HIGH, delay=duration)
+trigger()
