@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+import time, argparse
+import RPi.GPIO as GPIO
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--zone', type=str)
+parser.add_argument('--time', type=int)
+
+args = parser.parse_args()
+zone = args.zone
+duration = args.time * int('60')
+
+pin_list = [38,40]
+
+grass = [40]
+plants = [38]
+
+GPIO.setmode(GPIO.BOARD)
+
+for pin in pin_list:
+    GPIO.setup(pin, GPIO.OUT)
+
+def release_grass(mode=GPIO.LOW, delay=0):
+    GPIO.output(38, mode)
+
+def release_plants(mode=GPIO.LOW, delay=0):
+    GPIO.output(40, mode)
+
+def trigger(mode=GPIO.LOW, delay=0):
+    start = time.time()
+    if args.zone == 'grass':
+            print 'Watering that grass for you....'
+            GPIO.output(38, mode)
+	    release_grass()
+    elif args.zone == 'plants':
+            print 'Watering those plants for you....'
+	    GPIO.output(40, mode)
+	    release_plants()
+    else:
+	    print 'Not something I can understand'
+    time.sleep(delay)
+    end = time.time()
+    print 'Hopefully something has been waterd....'
+    duration = (end - start)
+    print duration, " seconds of watering"
+    GPIO.cleanup()
+
+time.sleep(1)
+trigger(mode=GPIO.HIGH, delay=duration)
